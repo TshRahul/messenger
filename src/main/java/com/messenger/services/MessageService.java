@@ -16,6 +16,6 @@ public interface MessageService {
 	
 	void updateMessage(Message message);
 	
-	String deleteMessage(long id);
+	Message deleteMessage(long id);
  
 }

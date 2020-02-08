@@ -16,6 +16,6 @@ public interface MessageDao {
 	
 	void updateMessage(Message message);
 	
-	String delete(long id);
+	Message delete(long id);
 
 }

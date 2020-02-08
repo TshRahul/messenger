@@ -1,16 +1,10 @@
 package com.messenger.model;
 
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-
-
 
 @Entity
 @Table(name = "MESSAGES")
@@ -42,6 +36,9 @@ public class Message {
 	
 	@Column(name = "isdeleted")
 	private boolean isDeleted;
+
+	@OneToMany(mappedBy = "message")
+	private List<Comment> comments;
 	
 	
 	public boolean isDeleted() {
@@ -92,6 +89,15 @@ public class Message {
 	public void setNoOfComments(long noOfComments) {
 		this.noOfComments = noOfComments;
 	}
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
 	@Override
 	public String toString() {
 		return "Message [id=" + id + ", message=" + message + ", author=" + author + ", created_date=" + created_date

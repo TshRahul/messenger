@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,16 +23,16 @@ import com.messenger.utilities.JwtUtil;
 public class JwtRequestFilter extends OncePerRequestFilter {
 	
 	@Autowired
-	JwtUtil jwtUtil;
+	private JwtUtil jwtUtil;
 	
 	@Autowired
-	UserDetailService userDetailService;
+    private UserDetailService userDetailService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		final String authorizationHeader = request.getHeader("Authorization");
-		
+		String tes = request.getMethod();
 		String userName = null;
 		String jwt = null;
 		

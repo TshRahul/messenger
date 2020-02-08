@@ -11,9 +11,9 @@ import com.messenger.model.Message;
 
 @Service
 public class MessageServiceImpl implements MessageService{
-	
-	@Autowired
-	MessageDao messageDao;
+
+    @Autowired
+    private MessageDao messageDao;
 
 	@Override
 	@Transactional
@@ -47,7 +47,7 @@ public class MessageServiceImpl implements MessageService{
 
 	@Override
 	@Transactional
-	public String deleteMessage(long id) {
+	public Message deleteMessage(long id) {
 		return messageDao.delete(id);
 	}
 	

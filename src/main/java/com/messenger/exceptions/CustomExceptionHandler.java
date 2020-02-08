@@ -16,11 +16,11 @@ import com.messenger.model.ErrorResponse;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(RecordNotFoundException.class)
-    public final ResponseEntity<Object> handleUserNotFoundException(RecordNotFoundException ex, WebRequest request) {
+    public final ResponseEntity<ErrorResponse> handleUserNotFoundException(RecordNotFoundException ex, WebRequest request) {
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse("Record Not Found", details);
-        return new ResponseEntity(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 	
 	@ExceptionHandler(RecordAlreadyPresent.class)
@@ -32,11 +32,20 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(IncorrectCredentialException.class)
-	public final ResponseEntity<Object> handleWrongCredentialsException(IncorrectCredentialException ex, WebRequest request){
+	public final ResponseEntity<ErrorResponse> handleWrongCredentialsException(IncorrectCredentialException ex, WebRequest request){
 		List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse("Credentials does not matched", details);
-        return new ResponseEntity(error, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+	}
+	
+	@ExceptionHandler(BadRequestException.class)
+	public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request){
+		List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse("Bad Request", details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+
 	}
 
 }

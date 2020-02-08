@@ -3,6 +3,7 @@ package com.messenger.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,12 @@ import com.messenger.services.MessageService;
 public class MessageController {
 	
 	@Autowired
-	MessageService messageService;
+	private MessageService messageService;
+	
+//	    @Autowired
+//	  //  @Qualifier("like")
+//	    LikeController like;
+	
 	
 	@GetMapping("message")
 	public List<Message> getAllMessages(){
@@ -51,8 +57,14 @@ public class MessageController {
 	}
 	
 	@DeleteMapping("message/{id}")
-	public String removeMessage(@PathVariable long id) {
+	public Message removeMessage(@PathVariable long id) {
 		return messageService.deleteMessage(id);
 	}
+	
+//	@RequestMapping("message/{id}/likes")
+//	public LikeController getLikeController() {
+//		return like;
+//	}
+	
 
 }

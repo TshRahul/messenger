@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,31 +17,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Table(name = "USER_DETAILS")
 public class User {
-	
-	@Id
-	@Column(name = "username")
-	@NotEmpty(message = "user name must not be empty")
-	String username;
+
+    @Id
+    @Column(name = "username")
+    @NotEmpty(message = "user name must not be empty")
+    private String username;
 	
 	@Column(name = "firstname")
 	@NotEmpty(message = "first name must not be empty")
-	String Firstname;
+	private String firstname;
 	
 	@Column(name = "lastname")
 	@NotEmpty(message = "last name must not be empty")
-	String Lastname;
+	private String lastname;
 	
 	@Column(name = "password")
 	@NotEmpty(message = "Password must not be empty")
-	String password;
+    private String password;
+	
+	@Column(name = "email")
+	@Email
+	@NotEmpty(message = "Email must not be empty")
+    private String email;
 	
 	@Column(name = "roles")
 	@NotEmpty(message = "Roles must not be empty")
-	String roles;
+    private String roles;
 	@Column(name = "created_date")
 	Date creation_date;
 	@Column(name = "active")
-	boolean active;
+    private boolean active;
+	
+	 @Column(name="profile_image")  
+	    public String profileImage;  
 	
 	
 	public String getUsername() {
@@ -50,16 +59,16 @@ public class User {
 		this.username = username;
 	}
 	public String getFirstname() {
-		return Firstname;
+		return firstname;
 	}
 	public void setFirstname(String firstname) {
-		Firstname = firstname;
+		this.firstname = firstname;
 	}
 	public String getLastname() {
-		return Lastname;
+		return lastname;
 	}
 	public void setLastname(String lastname) {
-		Lastname = lastname;
+		this.lastname = lastname;
 	}
 	
 	@JsonIgnore
@@ -71,7 +80,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getRoles() {
+	String getRoles() {
 		return roles;
 	}
 	public void setRoles(String roles) {
@@ -83,17 +92,36 @@ public class User {
 	public void setCreation_date(Date creation_date) {
 		this.creation_date = creation_date;
 	}
-	public boolean isActive() {
+	boolean isActive() {
 		return active;
 	}
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+	
+	
+	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	
+	
+	public String getProfileImage() {
+		return profileImage;
+	}
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
 	@Override
 	public String toString() {
-		return "User [ username=" + username + ", Firstname=" + Firstname + ", Lastname="
-				+ Lastname + ", password=" + password + ", roles=" + roles + ", creation_date=" + creation_date
-				+ ", active=" + active + "]";
+		return "User [ username=" + username + ", Firstname=" + firstname + ", Lastname="
+				+ lastname + ", password=" + password + ", roles=" + roles + ", creation_date=" + creation_date
+				+ ", active=" + active + "]" +  ", profileImage="  
+                + profileImage + "]";
 	}
 	
 	

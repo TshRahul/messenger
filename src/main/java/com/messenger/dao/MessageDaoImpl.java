@@ -8,11 +8,13 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import com.messenger.model.Comment;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.messenger.exceptions.BadRequestException;
 import com.messenger.exceptions.RecordNotFoundException;
 import com.messenger.model.Message;
 import com.messenger.repository.MessageRepo;
@@ -22,19 +24,37 @@ import com.messenger.utilities.BasicUtility;
 public class MessageDaoImpl implements MessageDao {
 	
 	@Autowired
-	EntityManager entityManager;
-	
+	private EntityManager entityManager;
+
 	@Autowired
-	MessageRepo messageRepo;
-	
-	BasicUtility baseUtil = new BasicUtility();
+	private MessageRepo messageRepo;
+
+	@Autowired
+	private CommentDao commentDao;
+
+	private BasicUtility baseUtil = new BasicUtility();
 
 	@Override
 	public List<Message> get() {
 		
 		Session currentSession = entityManager.unwrap(Session.class);
-		Query<Message> query = currentSession.createQuery("from Message", Message.class);
+		Query<Message> query = currentSession.createQuery("from Message where isdeleted = false", Message.class);
 		 List<Message> messages = query.getResultList();
+
+		for(Message message : messages){
+			List<Comment> comments = commentDao.getcomments(message.getId());
+                List<Comment> commentToAdd = new ArrayList<>();
+                 for(Comment comment : comments){
+					 System.out.println(comment);
+                 	if(!comment.isIs_deleted()){
+						commentToAdd.add(comment);
+					}
+				 }
+			message.setComments(commentToAdd);
+		 }
+
+
+
 		 System.out.println(messages);
 		 return messages;
 		
@@ -42,7 +62,7 @@ public class MessageDaoImpl implements MessageDao {
 
 	@Override
 	public List<Message> get(String username) {
-		List<Message> messages = new ArrayList<Message>();
+		List<Message> messages = new ArrayList<>();
 		Session currentSession = entityManager.unwrap(Session.class);
 		try {
 			Query query = currentSession.createSQLQuery(baseUtil.getValuesFromPropertyFile("isUserAlreadyExits").replace("%username%",username));
@@ -59,6 +79,18 @@ public class MessageDaoImpl implements MessageDao {
 
 		// Query query = currentSession.createQuery(baseUtil.getValuesFromPropertyFile("getMessagesByUsername").replace("%author%",username), Message.class);
 		 messages = messageRepo.findByAuthor(username);
+
+			for(Message message : messages){
+				List<Comment> comments = commentDao.getcomments(message.getId());
+				List<Comment> commentToAdd = new ArrayList<>();
+				for(Comment comment : comments){
+					System.out.println(comment);
+					if(!comment.isIs_deleted()){
+						commentToAdd.add(comment);
+					}
+				}
+				message.setComments(commentToAdd);
+			}
 		
 		System.out.println(messages);
 		}catch(Exception e) {
@@ -76,12 +108,23 @@ public class MessageDaoImpl implements MessageDao {
 		if(message == null) {
 			throw new RecordNotFoundException("The message with message id : " + id + " is not present");
 		}
-		
+		List<Comment> comments = commentDao.getcomments(message.getId());
+		List<Comment> commentToAdd = new ArrayList<>();
+		for(Comment comment : comments){
+			System.out.println(comment);
+			if(!comment.isIs_deleted()){
+				commentToAdd.add(comment);
+			}
+		}
+		message.setComments(commentToAdd);
 		return message;
 	}
 
 	@Override
 	public void save(Message message) {
+		if(message.getMessage().isEmpty()) {
+			throw new BadRequestException("Empty message is not accepted");
+		}
 		
 		Session currentSession = entityManager.unwrap(Session.class);
 		try {
@@ -116,27 +159,44 @@ public class MessageDaoImpl implements MessageDao {
 //		if(message2 == null) {
 //			throw new RecordNotFoundException("The message with message id : " + message.getId() + " is not present");
 //		}
+		Message messageByID = messageRepo.findById(message.getId());
+		if(messageByID == null) {
+			throw new RecordNotFoundException("The message with message id : " + message.getId() + " is not present");
+		}
 		Session currentSession = entityManager.unwrap(Session.class);
-		Date date=Calendar.getInstance().getTime();  
-		 message.setModified_date(date);
-		 currentSession.saveOrUpdate(message);
+		try {
+			Date date=Calendar.getInstance().getTime();  
+		Query updateMessage = currentSession.createSQLQuery(baseUtil.getValuesFromPropertyFile("updateMessageForMessageId").replace("%message%",message.getMessage()).replace("%modifiedDate%", date.toString()).replace("%messageId%", String.valueOf( message.getId())));
+		updateMessage.executeUpdate();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public String delete(long id) {
+	public Message delete(long id) {
 		
 		  Message message = messageRepo.findById(id);
 			
 			if(message == null) {
 				throw new RecordNotFoundException("The message with message id : " + id + " is not present");
 			}
+		Session currentSession = entityManager.unwrap(Session.class);
+            List<Comment> comments = message.getComments();
+
+			if(comments != null){
+                  for(Comment comment : comments){
+                       comment.setIs_deleted(true);
+                       currentSession.saveOrUpdate(comment);
+				  }
+			}
 		
 			Message message2 = messageRepo.findById(id);
 			message2.setDeleted(true);
-			Session currentSession = entityManager.unwrap(Session.class);
+
 			currentSession.saveOrUpdate(message2);
 			
-			return "The message with message id : "+ id +" is deleted successfully ";
+			return message;
 		
 	}
 	

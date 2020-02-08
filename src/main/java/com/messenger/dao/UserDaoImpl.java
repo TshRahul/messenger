@@ -24,17 +24,18 @@ import com.messenger.utilities.BasicUtility;
 public class UserDaoImpl implements UserDao {
 	
 	@Autowired
-	EntityManager entityManager;
-	
-	BasicUtility baseUtil = new BasicUtility();
+	private EntityManager entityManager;
+
+    private BasicUtility baseUtil = new BasicUtility();
 
 	@Override
 	public List<User> get() {
 		
 		Session currentSession = entityManager.unwrap(Session.class);
 		 Query<User> query = currentSession.createQuery("from User", User.class);
-		 List<User> users = query.getResultList();
-		 return users;
+		 List<User> users;
+        users = query.getResultList();
+        return users;
 		         
 	}
 
@@ -42,8 +43,7 @@ public class UserDaoImpl implements UserDao {
 	public User get(String username) {
 		
 		Session currentSession = entityManager.unwrap(Session.class);
-		User user = currentSession.get(User.class, username);
-		return user;
+        return currentSession.get(User.class, username);
 	}
 
 	@Override
@@ -62,7 +62,6 @@ public class UserDaoImpl implements UserDao {
 
 		 String  originalPassword = user.getPassword();
 	        String generatedSecuredPasswordHash = Sha512DigestUtils.shaHex(originalPassword);
-	        System.out.println(generatedSecuredPasswordHash);
 	        user.setPassword(generatedSecuredPasswordHash);
 		Date date=Calendar.getInstance().getTime();  
 		
@@ -108,5 +107,35 @@ public class UserDaoImpl implements UserDao {
 		return "user with username : " + username + " is deleted successfully";
 	
 	}
+	
+	@Override
+	public int updateProfileImage(String profileImage, String username) {  
+        Session session= entityManager.unwrap(Session.class);  
+        int result;  
+          
+        try  
+        {  
+            Query query = session.createQuery("update UserDetail set profileImage = :profileImage where username=:username ");  
+            query.setParameter("profileImage", profileImage);  
+            query.setParameter("username", username);  
+            result = query.executeUpdate();  
+            if(result > 0)  
+            {  
+                return result;  
+            }  
+            else return -5;  
+        }  
+        catch(Exception exception)  
+        {  
+            System.out.println("Error while updating profileImage from DAO :: " + exception.getMessage());  
+            return -5;  
+        }  
+        finally  
+        {  
+            session.flush();  
+        }  
+          
+          
+    }  
 
 }

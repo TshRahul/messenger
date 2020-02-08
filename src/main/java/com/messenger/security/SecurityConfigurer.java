@@ -2,6 +2,7 @@ package com.messenger.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,10 +20,10 @@ import com.messenger.services.UserDetailService;
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
-	UserDetailService userDetailsService;
+    private UserDetailService userDetailsService;
 	
 	@Autowired
-	JwtRequestFilter jetRequestFilter;
+    private JwtRequestFilter jetRequestFilter;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -34,7 +35,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception {
 		
 		http.csrf().disable()
-		.authorizeRequests().antMatchers("/api/", "/api/authenticate", "/api/register", "/api/user").permitAll()
+		.authorizeRequests().antMatchers("/api/", "/api/authenticate", "/api/register").permitAll()
+		.antMatchers(HttpMethod.OPTIONS, "**").permitAll()
 		.antMatchers("/js/**", "/css/**", "/img/**" ).permitAll()
 		.anyRequest().authenticated()
 		.and().sessionManagement()

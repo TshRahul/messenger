@@ -16,5 +16,6 @@ public interface UserDao {
 
 	void updateUserDetails(User user);
 
+	int updateProfileImage(String profileImage, String username);
 
 }
